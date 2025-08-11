@@ -1,44 +1,35 @@
-// Fichier : netlify/functions/lister-images.js (Version unifiée "Edge Function")
-import { promises as fs } from 'fs';
-import path from 'path';
+// Fichier : netlify/functions/lister-images.js
 
-// Note : 'walk' doit être réécrit avec des promesses pour être asynchrone
-async function walk(dir, allFiles = []) {
+const fs = require('fs');
+const path = require('path');
+
+const walk = (dir, allFiles = []) => {
   try {
-    const files = await fs.readdir(dir);
-    for (const file of files) {
+    const files = fs.readdirSync(dir);
+    files.forEach(file => {
       const filePath = path.join(dir, file);
-      const stat = await fs.stat(filePath);
-      if (stat.isDirectory()) {
-        await walk(filePath, allFiles);
+      if (fs.statSync(filePath).isDirectory()) {
+        walk(filePath, allFiles);
       } else {
         allFiles.push(filePath);
       }
-    }
-  } catch (error) {
-    console.error(`Erreur de lecture dans walk: ${dir}`, error.message);
-  }
+    });
+  } catch (error) { /* Ignorer les erreurs de lecture */ }
   return allFiles;
-}
+};
 
-export default async (req, context) => {
+exports.handler = async function(event, context) {
   try {
-    // Le chemin est plus simple à calculer avec les Edge Functions
-    const imagesDir = path.resolve(context.site.path, 'images');
+    const searchRoot = path.resolve(__dirname, '../../');
+    const imagesDir = path.join(searchRoot, 'images');
 
-    // On vérifie si le dossier existe, sinon on renvoie un objet vide
-    try {
-      await fs.access(imagesDir);
-    } catch {
-      console.warn(`Le dossier images n'a pas été trouvé à l'emplacement : ${imagesDir}`);
-      return new Response(JSON.stringify({}), {
-        headers: { 'Content-Type': 'application/json' }
-      });
+    if (!fs.existsSync(imagesDir)) {
+      return { statusCode: 200, body: JSON.stringify({}) };
     }
 
-    const allImageFiles = (await walk(imagesDir))
+    const allImageFiles = walk(imagesDir)
       .filter(file => /\.(jpe?g|png|gif|svg|webp)$/i.test(file));
-
+      
     const groupedImages = {};
     const rootFolderName = "Images Principales";
 
@@ -49,25 +40,24 @@ export default async (req, context) => {
 
       if (!groupedImages[folderName]) groupedImages[folderName] = [];
       
+      // NOUVEAU : On crée un objet avec le nom et le chemin
       groupedImages[folderName].push({
-        name: path.basename(file),
-        path: '/' + path.join('images', relativePath).replace(/\\/g, '/')
+        name: path.basename(file), // ex: "plage.jpg"
+        path: '/' + path.join('images', relativePath).replace(/\\/g, '/') // ex: "/images/Vacances/plage.jpg"
       });
     });
-
+    
+    // Trier les images par nom dans chaque dossier
     for (const folder in groupedImages) {
-      groupedImages[folder].sort((a, b) => a.name.localeCompare(b.name));
+        groupedImages[folder].sort((a, b) => a.name.localeCompare(b.name));
     }
 
-    return new Response(JSON.stringify(groupedImages), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(groupedImages),
+    };
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+    return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
   }
-};
-
-export const config = {
-  path: "/.netlify/functions/lister-images"
 };
