@@ -39,43 +39,58 @@
   <p id="loading">Chargement des images...</p>
   <div id="gallery"></div>
 
-  <script>
-    // On attend que la page soit chargée pour exécuter le script
+  <!-- Mettez ceci à la place de l'ancien <script> -->
+<script>
     document.addEventListener('DOMContentLoaded', () => {
       const gallery = document.getElementById('gallery');
       const loadingMessage = document.getElementById('loading');
 
-      // On appelle notre Netlify Function
-      // L'URL est toujours la même : /.netlify/functions/NOM_DU_FICHIER_JS
-      fetch('/.netlify/functions/lister-images')
-        .then(response => response.json())
-        .then(imagePaths => {
-          loadingMessage.style.display = 'none'; // On cache le message de chargement
+      console.log("Page chargée, début de la récupération des images...");
 
-          if (imagePaths.length === 0) {
-            gallery.innerHTML = "<p>Aucune image trouvée.</p>";
+      fetch('/.netlify/functions/lister-images')
+        .then(response => {
+          console.log("Réponse reçue du serveur. Statut:", response.status);
+          if (!response.ok) {
+            throw new Error(`Le serveur a répondu avec une erreur: ${response.statusText}`);
+          }
+          return response.json();
+        })
+        .then(imagePaths => {
+          console.log("Liste des chemins d'images reçue :", imagePaths); // <-- REGARDEZ CECI DANS LA CONSOLE
+
+          loadingMessage.style.display = 'none';
+
+          if (!imagePaths || imagePaths.length === 0) {
+            gallery.innerHTML = "<p>Aucune image trouvée. La fonction a peut-être renvoyé une liste vide.</p>";
+            console.warn("La liste d'images est vide.");
             return;
           }
 
-          // Pour chaque chemin d'image reçu, on crée un élément <img>
           imagePaths.forEach(path => {
+            console.log("Création de l'image pour le chemin :", path); // <-- Vérifiez que ces chemins sont corrects
             const div = document.createElement('div');
             div.className = 'gallery-item';
             
             const img = document.createElement('img');
             img.src = path;
             img.alt = `Image située à ${path}`;
+            // Ajout d'un gestionnaire d'erreur pour chaque image
+            img.onerror = () => {
+              console.error(`Erreur de chargement pour l'image : ${path}. Vérifiez si le fichier existe bien à cette URL.`);
+              div.style.border = '2px solid red'; // Met une bordure rouge sur les images qui ne chargent pas
+            };
 
             div.appendChild(img);
             gallery.appendChild(div);
           });
         })
         .catch(error => {
-          console.error("Erreur lors de la récupération des images:", error);
-          loadingMessage.textContent = "Impossible de charger la galerie d'images.";
+          console.error("ERREUR CRITIQUE lors de la récupération de la galerie:", error);
+          loadingMessage.textContent = "Impossible de charger la galerie. Vérifiez la console pour les erreurs.";
         });
     });
-  </script>
+</script>
 
 </body>
+
 </html>
