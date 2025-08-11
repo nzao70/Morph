@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADL</title>
+    <link rel="icon" href="https://qrlod.org/IMAGE/QRlod-icon.png" type="image/icon type">
+    <link href="https://fonts.googleapis.com/css2?family=Bruno+Ace+SC&family=Monomaniac+One&display=swap"
+        rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        ::-webkit-scrollbar {
+            width: 0.7em;
+            height: 0.3em;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #101728;
+            border-radius: 100px;
+            margin-block: .5em;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(rgb(201, 168, 49), rgb(255, 217, 82), rgb(255, 248, 221));
+            border-radius: 100px;
+        }
+
+
+        body {
+            margin: 0px;
+            padding: 0px;
+            width: 100%;
+            height: auto;
+            background-color: #101728;
+            overflow-x: hidden;
+            font: small-caps 14px/1 sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+        }
+
+
+
+
+
+
+
+
+
+
+        .supsup {
+            top: 0;
+            left: 0;
+            overflow-y: auto;
+            position: absolute;
+            width: 100%;
+            height: auto;
+            z-index: 9991;
+            display: none;
+
+        }
+
+        .suppub h1 {
+            color: red;
+        }
+
+        .suppub {
+            position: fixed;
+            background-color: #000000e3;
+            width: 100%;
+            height: 100vh;
+            padding-top: 0px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .imgsuppub {
+            border-radius: 20px;
+            position: relative;
+            width: 700px;
+            height: 400px;
+            overflow-y: auto;
+            border: solid #FFD43B;
+        }
+
+        .croixsuppub {
+            border-radius: 100%;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px;
+            padding-left: 10px;
+            padding-right: 10px;
+            background-color: rgba(0, 0, 0, 0.711);
+            border: solid #FFD43B;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .croixsuppub:hover {
+            transform: scale(0.7);
+        }
+
+
+        .imgsuppubBLOCK {
+            border-radius: 20px;
+            width: 100%;
+        }
+
+
+
+
+
+
+
+        .suport {
+            position: relative;
+            width: 100%;
+            padding: 20px;
+            height: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+        }
+
+        .suport h1 {
+            text-decoration: underline;
+
+        }
+
+        .suport a {
+            color: white;
+            text-decoration: none;
+            background-color: rgb(201, 168, 49);
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .suport a.clicked {
+            background-color: red;
+            color: white;
+        }
+
+        .suport iframe {
+            margin-top: 30px;
+            border-radius: 10px;
+            width: 300px;
+            padding: 10px;
+            border-radius: 20px;
+            border: solid 5px #c9a831;
+            height: 600px;
+        }
+
+        .suport a img {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 10px;
+            width: 300px;
+        }
+
+        .suport P {
+            margin-bottom: 20px;
+        }
+
+
+        .suport img {
+            width: 35%;
+            border-radius: 20px;
+            border: solid 5px #c9a831;
+
+        }
+
+        @media screen and (max-width: 1400px) {
+            .imgsuppub {
+                width: 600px;
+            }
+        }
+
+        @media screen and (max-width: 700px) {
+            .imgsuppub {
+                width: 520px;
+            }
+
+            .suport img {
+                width: 75%;
+
+            }
+
+        }
+
+        @media screen and (max-width: 500px) {
+            .imgsuppub {
+                width: 400px;
+            }
+
+            .suport img {
+                width: 95%;
+
+            }
+        }
+
+        @media screen and (max-width: 400px) {
+            .imgsuppub {
+                width: 360px;
+            }
+
+        }
+
+        @media screen and (max-width: 340px) {
+            .imgsuppub {
+                width: 300px;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <div class="supsup">
+        <div class="suppub">
+            <h1>Contenu réservé aux adultes.</h1>
+            <div class="imgsuppub">
+                <img class="imgsuppubBLOCK" data-src="IMAGE/QRlod-back.png" alt="Suppub Image">
+                <button class="croixsuppub">
+                    <i class="fa-solid fa-xmark fa-2xl" style="color: #FFD43B;"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+
+            changeImageSource('https://qrlod.org/IMAGE/Moins18.png');
+
+            function changeImageSource(newSrc) {
+                const img = $('.imgsuppubBLOCK');
+                img.attr('src', newSrc);
+            }
+
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+
+            $('.supsup').fadeIn('slow');
+
+            $('.croixsuppub').click(function () {
+                $('.supsup').fadeOut('slow');
+            });
+        });
+
+    </script>
+
+
+
+
+
+
+    <div class="suport">
+        <img src="https://qrlod.org/adult/image/a-delicate-relationship/adelicat.jpg">
+        <h1>A Delicate Relationship chapitre 34 [Anglais]</h1>
+
+        <p>
+            chapitre 34 de A Delicate Relationship en anglais (IMAGE).
+        </p>
+        <!-- Téléchargement d'un fichier  -->
+        <div style="display: flex; flex-wrap: wrap; width: 100%; height: auto; gap: 10px;">
+            <p><a target="_blank"
+                    href="APPA2/01.jpg" download>Page
+                    1</a></p>
+            <p><a target="_blank"
+                    href="APPA2/02.jpg" download>Page
+                    2</a></p>
+            <p>
+                <a target="_blank"
+                    href="APPA2/03.jpg" download>Page
+                    3</a>
+            </p>
+            <p><a target="_blank"
+                    href="APPA2/04.jpg" download>Page
+                    4</a></p>
+            <p> <a target="_blank"
+                    href="APPA2/05.jpg" download>Page
+                    5</a></p>
+            <p> <a target="_blank"
+                    href="APPA2/06.jpg" download>Page
+                    6</a></p>
+            <p><a target="_blank"
+                    href="APPA2/07.jpg" download>Page
+                    7</a></p>
+            <p><a target="_blank"
+                    href="APPA2/08.jpg" download>Page
+                    8</a></p>
+            <p><a target="_blank"
+                    href="APPA2/09.jpg" download>Page
+                    9</a></p>
+            <p> <a target="_blank"
+                    href="APPA2/10.jpg" download>Page
+                    10</a></p>
+            <p><a target="_blank"
+                    href="APPA2/11.jpg" download>Page
+                    11</a></p>
+            <p><a target="_blank"
+                    href="APPA2/12.jpg" download>Page
+                    12</a></p>
+            <p><a target="_blank"
+                    href="APPA2/13.jpg" download>Page
+                    13</a></p>
+            <p>
+                <a target="_blank"
+                    href="APPA2/14.jpg" download>Page
+                    14</a>
+            </p>
+
+        </div>
+
+
+        <h1>------------------------------------------------------------------------------------------</h1>
+        <img src="https://qrlod.org/adult/image/a-delicate-relationship/adelicat.jpg">
+        <h1>A Delicate Relationship chapitre 33 [Anglais]</h1>
+
+        <p>
+            chapitre 33 de A Delicate Relationship en anglais (IMAGE).
+        </p>
+        <!-- Téléchargement d'un fichier  -->
+        <div style="display: flex; flex-wrap: wrap; width: 100%; height: auto; gap: 10px;">
+            <p><a target="_blank"
+                    href="APPA1/01.jpg" download>Page
+                    1</a></p>
+            <p><a target="_blank"
+                    href="APPA1/02.jpg" download>Page
+                    2</a></p>
+            <p>
+                <a target="_blank"
+                    href="APPA1/03.jpg" download>Page
+                    3</a>
+            </p>
+            <p><a target="_blank"
+                    href="APPA1/04.jpg" download>Page
+                    4</a></p>
+            <p> <a target="_blank"
+                    href="APPA1/05.jpg" download>Page
+                    5</a></p>
+            <p> <a target="_blank"
+                    href="APPA1/06.jpg" download>Page
+                    6</a></p>
+            <p><a target="_blank"
+                    href="APPA1/07.jpg" download>Page
+                    7</a></p>
+            <p><a target="_blank"
+                    href="APPA1/08.jpg" download>Page
+                    8</a></p>
+            <p><a target="_blank"
+                    href="APPA1/09.jpg" download>Page
+                    9</a></p>
+            <p> <a target="_blank"
+                    href="APPA1/10.jpg" download>Page
+                    10</a></p>
+            <p><a target="_blank"
+                    href="APPA1/11.jpg" download>Page
+                    11</a></p>
+            <p><a target="_blank"
+                    href="APPA1/12.jpg" download>Page
+                    12</a></p>
+            <p><a target="_blank"
+                    href="APPA1/13.jpg" download>Page
+                    13</a></p>
+            <p>
+                <a target="_blank"
+                    href="APPA1/14.jpg" download>Page
+                    14</a>
+            </p>
+
+        </div>
+
+
+        <h1>------------------------------------------------------------------------------------------</h1>
+        <img src="https://qrlod.org/adult/image/a-delicate-relationship/adelicat.jpg">
+        <h1>A Delicate Relationship chapitre 32 bulle de dialogue vide.</h1>
+
+        <p>
+            chapitre 32 de A Delicate Relationship avec les bulles de dialogue vide dans ce dossier zip.
+        </p>
+        <!-- Téléchargement d'un fichier ZIP -->
+        <p>
+            <a href="ADRcleanCh32.zip" download="ADRcleanCh32.zip">Télécharger le dossier ZIP</a>
+        </p>
+        <p>
+            Instructions du chapitre dans ce fichier texte.
+        </p>
+
+        <!-- Téléchargement d'un fichier TXT -->
+        <p>
+            <a href="Traduction et mise en page A Delica.txt" download="A Delica.txt">Télécharger le fichier TXT</a>
+        </p>
+
+
+        <h1>------------------------------------------------------------------------------------------</h1>
+
+        <p>
+            <strong>Le but de cette page web est de donner libre accès aux traductions des œuvres publiées sur
+                QRlod.</strong><br><br> Ici, tu peux apprendre en utilisant le guide situé juste ci-dessous. <br> <br>
+            Nous avons reçu des retours concernant des fautes d'orthographe, et pour améliorer la qualité de nos
+            projets, nous avons mis en place une page web où tu peux suivre l'avancement des traductions et contribuer
+            directement : nettoyage de bulles, révisions, ou traductions en cours.<br> <br>Si tu souhaites aider, ne
+            reste pas seul : rejoins notre canal Telegram pour collaborer avec la communauté et échanger des conseils.
+            Une fois le chapitre terminé en ta possession, il te suffit d’envoyer un message sur Telegram ou Instagram.
+            Les chapitres seront diffusés un peu partout, et tu auras la possibilité de rejoindre officiellement notre
+            équipe et de travailler avec nous !
+        </p>
+
+        <a
+            href="https://www.canva.com/design/DAGK5PzBv-c/qrxxy0Y-zMf0JCFaBqbVKA/view?utm_content=DAGK5PzBv-c&utm_campaign=designshare&utm_medium=link&utm_source=editor#1">
+            <img src="https://www.qrlod-game.qc.lu/animmanga/leguidescan.png">
+        </a>
+
+        <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; width: 100%; height: auto; gap: 10px; margin-top: 100px;">
+            <img style="width: 150px;" src="https://raw.githubusercontent.com/nzao70/authorview/refs/heads/main/Sans%20titre%201195_20240927102557.png" >
+            <img style="width: 150px;" src="https://raw.githubusercontent.com/nzao70/authorview/refs/heads/main/Sans%20titre%201120_20240727094209.png" >
+            <img style="width: 150px;" src="https://raw.githubusercontent.com/nzao70/authorview/refs/heads/main/Sans%20titre%2031_20240523212530.png" >
+            <img style="width: 150px;" src="https://raw.githubusercontent.com/nzao70/authorview/refs/heads/main/Sans%20titre%201035_20240621113132.png" >
+            <img style="width: 150px;" src="https://raw.githubusercontent.com/nzao70/authorview/refs/heads/main/Sans%20titre%201123_20240731092602.jpg" >
+        </div>
+
+        <iframe src="https://qrlod-land.frog.tech/672e4ad4a098e" frameborder="0"></iframe>
+    </div>
+
+
+    <script>
+        const links = document.querySelectorAll('a');
+
+        links.forEach(link => {
+            link.addEventListener('click', (event) => {
+                // Ajoute la classe "clicked" au lien cliqué
+                event.target.classList.add('clicked');
+            });
+        });
+    </script>
+</body>
+
+</html>
