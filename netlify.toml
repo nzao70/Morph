@@ -1,2 +1,6 @@
+# Fichier : netlify.toml
+
 [functions]
   directory = "netlify/functions/"
+  # Ajout de cette ligne cruciale :
+  included_files = ["images/**"]
