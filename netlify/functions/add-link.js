@@ -27,7 +27,4 @@ export default async (req, context) => {
     return new Response(`Erreur lors de l'ajout du lien: ${error.message}`, { status: 500 });
   }
 };
-
-export const config = {
-  path: "/.netlify/functions/add-link"
-};
+// La section 'config' a été supprimée

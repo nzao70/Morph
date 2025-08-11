@@ -18,7 +18,4 @@ export default async (req, context) => {
     return new Response(`Erreur lors de la récupération des liens: ${error.message}`, { status: 500 });
   }
 };
-
-export const config = {
-  path: "/.netlify/functions/get-links"
-};
+// La section 'config' a été supprimée

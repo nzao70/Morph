@@ -2,5 +2,6 @@
 
 [functions]
   directory = "netlify/functions/"
-  # Ajout de cette ligne cruciale :
   included_files = ["images/**"]
+  # Ajout de cette ligne pour être explicite
+  node_bundler = "esbuild"

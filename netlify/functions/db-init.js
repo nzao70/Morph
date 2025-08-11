@@ -5,7 +5,6 @@ export default async (req, context) => {
   try {
     const sql = neon();
     
-    // Crée la table 'links' si elle n'existe pas
     await sql`
       CREATE TABLE IF NOT EXISTS links (
         id SERIAL PRIMARY KEY,
@@ -20,7 +19,4 @@ export default async (req, context) => {
     return new Response(`Erreur lors de l'initialisation de la table: ${error.message}`, { status: 500 });
   }
 };
-
-export const config = {
-  path: "/.netlify/functions/db-init"
-};
+// La section 'config' a été supprimée
