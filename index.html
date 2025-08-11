@@ -3,119 +3,175 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Explorateur d'images</title>
+  <title>Explorateur d'images et de liens</title>
   <style>
     body { font-family: sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; color: #333; }
     .container { max-width: 1200px; margin: auto; background: white; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 8px; }
-    h1 { text-align: center; }
-    #folder-nav { text-align: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #ddd; }
-    .folder-button { background: #e9ecef; border: 1px solid #ced4da; padding: 10px 15px; margin: 5px; cursor: pointer; border-radius: 5px; transition: background-color 0.2s; }
-    .folder-button:hover { background-color: #dee2e6; }
-    .folder-button.active { background-color: #007bff; color: white; border-color: #007bff; }
+    h1, h2 { text-align: center; color: #003366; }
+    .section-divider { border: 0; height: 1px; background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0)); margin: 40px 0; }
     
+    /* Styles de l'explorateur d'images */
+    #folder-nav { text-align: center; margin-bottom: 20px; }
+    .folder-button { background: #e9ecef; border: 1px solid #ced4da; padding: 10px 15px; margin: 5px; cursor: pointer; border-radius: 5px; }
+    .folder-button.active { background-color: #007bff; color: white; border-color: #007bff; }
     .explorer { display: flex; gap: 20px; min-height: 50vh; }
     #image-list { width: 30%; border-right: 1px solid #ddd; padding-right: 20px; overflow-y: auto; }
     #image-viewer { flex: 1; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa; border-radius: 5px; }
-    
-    .image-list-item { padding: 10px; cursor: pointer; border-radius: 4px; border: 1px solid transparent; }
+    .image-list-item { padding: 10px; cursor: pointer; border-radius: 4px; }
     .image-list-item:hover { background-color: #f1f3f5; }
-    .image-list-item.active { background-color: #cce5ff; border-color: #b8daff; font-weight: bold; }
+    .image-list-item.active { background-color: #cce5ff; font-weight: bold; }
+    #image-viewer img { max-width: 100%; max-height: 80vh; display: block; }
     
-    #image-viewer img { max-width: 100%; max-height: 80vh; display: block; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-    #status-message { text-align: center; color: #6c757d; font-size: 1.1em; padding: 40px 0; }
+    /* Styles de la section des liens */
+    #links-section form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    #links-section input, #links-section textarea { padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1em; }
+    #links-section button { background-color: #28a745; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 1.1em; }
+    #links-section button:hover { background-color: #218838; }
+    #links-container .link-item { background: #f8f9fa; border: 1px solid #e9ecef; border-left: 5px solid #007bff; padding: 15px; margin-bottom: 10px; border-radius: 4px; }
+    #links-container .link-item a { font-weight: bold; color: #0056b3; text-decoration: none; }
+    #links-container .link-item p { margin: 5px 0 0; color: #495057; }
+    .status-message { text-align: center; color: #6c757d; font-size: 1.1em; padding: 20px 0; }
   </style>
 </head>
 <body>
 
   <div class="container">
+    <!-- Section Explorateur d'images -->
     <h1>Explorateur d'images</h1>
-    
     <nav id="folder-nav"></nav>
-
     <div class="explorer">
       <div id="image-list"></div>
-      <div id="image-viewer">
-        <p id="status-message">Veuillez sélectionner un dossier, puis une image.</p>
+      <div id="image-viewer"><p class="status-message">Veuillez sélectionner un dossier.</p></div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- Section Liens utiles -->
+    <div id="links-section">
+      <h2>Liens utiles</h2>
+      <form id="add-link-form">
+        <input type="url" id="link-url" placeholder="https://exemple.com" required>
+        <textarea id="link-description" rows="3" placeholder="Description du lien"></textarea>
+        <button type="submit">Ajouter le lien</button>
+      </form>
+      <div id="links-container">
+        <p class="status-message" id="links-status">Chargement des liens...</p>
       </div>
     </div>
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // --- LOGIQUE POUR L'EXPLORATEUR D'IMAGES ---
       const folderNav = document.getElementById('folder-nav');
       const imageList = document.getElementById('image-list');
       const imageViewer = document.getElementById('image-viewer');
-      const statusMessage = document.getElementById('status-message');
       let imageData = {};
 
       function showImage(path, element) {
-        // Met en surbrillance le nom du fichier cliqué
         document.querySelectorAll('.image-list-item').forEach(item => item.classList.remove('active'));
         element.classList.add('active');
-
-        // Affiche l'image
-        imageViewer.innerHTML = ''; // Vide la zone de visualisation
-        const img = document.createElement('img');
-        img.src = path;
-        img.alt = "Image en cours de visualisation";
-        imageViewer.appendChild(img);
+        imageViewer.innerHTML = `<img src="${path}" alt="Image en cours de visualisation">`;
       }
 
       function displayFolderContents(folderName) {
-        // Vide les panneaux précédents
         imageList.innerHTML = '';
-        imageViewer.innerHTML = '<p id="status-message">Sélectionnez une image dans la liste.</p>';
-
-        // Met à jour le bouton de dossier actif
-        document.querySelectorAll('.folder-button').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.folder === folderName);
-        });
-
+        imageViewer.innerHTML = '<p class="status-message">Sélectionnez une image.</p>';
+        document.querySelectorAll('.folder-button').forEach(btn => btn.classList.toggle('active', btn.dataset.folder === folderName));
         const images = imageData[folderName] || [];
-        if (images.length === 0) {
-            imageList.innerHTML = '<p>Dossier vide.</p>';
-            return;
-        }
-
-        // Crée la liste des noms de fichiers
         images.forEach(image => {
-            const item = document.createElement('div');
-            item.className = 'image-list-item';
-            item.textContent = image.name;
-            item.onclick = () => showImage(image.path, item);
-            imageList.appendChild(item);
+          const item = document.createElement('div');
+          item.className = 'image-list-item';
+          item.textContent = image.name;
+          item.onclick = () => showImage(image.path, item);
+          imageList.appendChild(item);
         });
       }
 
-      // Appel initial à la fonction
-      statusMessage.textContent = 'Chargement des dossiers...';
       fetch('/.netlify/functions/lister-images')
         .then(response => response.json())
         .then(groupedImages => {
           imageData = groupedImages;
           const folderNames = Object.keys(groupedImages).sort();
-
-          if (folderNames.length === 0) {
-            statusMessage.textContent = "Aucun dossier d'images n'a été trouvé.";
-            return;
+          if (folderNames.length > 0) {
+            folderNames.forEach(name => {
+              const button = document.createElement('button');
+              button.className = 'folder-button';
+              button.textContent = name;
+              button.dataset.folder = name;
+              button.onclick = () => displayFolderContents(name);
+              folderNav.appendChild(button);
+            });
           }
-          
-          statusMessage.parentElement.removeChild(statusMessage); // On enlève le message initial
-
-          // Crée les boutons des dossiers
-          folderNames.forEach(name => {
-            const button = document.createElement('button');
-            button.className = 'folder-button';
-            button.textContent = name;
-            button.dataset.folder = name;
-            button.onclick = () => displayFolderContents(name);
-            folderNav.appendChild(button);
-          });
-        })
-        .catch(error => {
-          console.error("Erreur:", error);
-          statusMessage.textContent = "Impossible de charger les données.";
         });
+
+      // --- LOGIQUE POUR LA SECTION DES LIENS ---
+      const addLinkForm = document.getElementById('add-link-form');
+      const linksContainer = document.getElementById('links-container');
+      const linksStatus = document.getElementById('links-status');
+
+      async function loadLinks() {
+        try {
+          const response = await fetch('/.netlify/functions/get-links');
+          if (!response.ok) throw new Error('Erreur réseau');
+          const links = await response.json();
+          
+          linksStatus.style.display = 'none';
+          linksContainer.innerHTML = ''; // Vide la liste avant de la remplir
+
+          if (links.length === 0) {
+            linksContainer.innerHTML = '<p class="status-message">Aucun lien sauvegardé pour le moment.</p>';
+          } else {
+            links.forEach(link => {
+              const linkEl = document.createElement('div');
+              linkEl.className = 'link-item';
+              linkEl.innerHTML = `
+                <a href="${link.url}" target="_blank" rel="noopener noreferrer">${link.url}</a>
+                <p>${link.description || 'Pas de description'}</p>
+              `;
+              linksContainer.appendChild(linkEl);
+            });
+          }
+        } catch (error) {
+          linksStatus.textContent = 'Impossible de charger les liens.';
+          console.error(error);
+        }
+      }
+
+      addLinkForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const urlInput = document.getElementById('link-url');
+        const descriptionInput = document.getElementById('link-description');
+        const button = addLinkForm.querySelector('button');
+
+        button.disabled = true;
+        button.textContent = 'Ajout en cours...';
+
+        try {
+          const response = await fetch('/.netlify/functions/add-link', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              url: urlInput.value,
+              description: descriptionInput.value
+            })
+          });
+          if (!response.ok) throw new Error('Erreur lors de l\'ajout');
+          
+          urlInput.value = '';
+          descriptionInput.value = '';
+          loadLinks(); // Recharge la liste des liens pour afficher le nouveau
+        } catch (error) {
+          alert('Une erreur est survenue. Veuillez réessayer.');
+          console.error(error);
+        } finally {
+          button.disabled = false;
+          button.textContent = 'Ajouter le lien';
+        }
+      });
+      
+      // Charger les liens au démarrage
+      loadLinks();
     });
   </script>
 
