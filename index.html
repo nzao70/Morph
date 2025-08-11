@@ -3,103 +3,92 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Galerie d'images par dossier</title>
+  <title>Explorateur d'images</title>
   <style>
-    body { font-family: sans-serif; background-color: #f0f0f0; margin: 0; padding: 20px; }
-    h1 { text-align: center; color: #333; }
-    #folder-nav {
-      text-align: center;
-      margin-bottom: 20px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid #ccc;
-    }
-    .folder-button {
-      background-color: #fff;
-      border: 1px solid #ddd;
-      padding: 10px 15px;
-      margin: 5px;
-      cursor: pointer;
-      border-radius: 5px;
-      font-size: 1em;
-      transition: background-color 0.2s, color 0.2s;
-    }
-    .folder-button:hover {
-      background-color: #e9e9e9;
-    }
-    .folder-button.active {
-      background-color: #007bff;
-      color: white;
-      border-color: #007bff;
-    }
-    #gallery {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      justify-content: center;
-      min-height: 100px;
-    }
-    .gallery-item {
-      border: 5px solid white;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      transition: transform 0.2s;
-    }
-    .gallery-item:hover {
-      transform: scale(1.05);
-    }
-    img {
-      max-width: 250px;
-      max-height: 250px;
-      display: block;
-    }
-    #status-message { text-align: center; font-size: 1.2em; color: #555; }
+    body { font-family: sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; color: #333; }
+    .container { max-width: 1200px; margin: auto; background: white; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 8px; }
+    h1 { text-align: center; }
+    #folder-nav { text-align: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #ddd; }
+    .folder-button { background: #e9ecef; border: 1px solid #ced4da; padding: 10px 15px; margin: 5px; cursor: pointer; border-radius: 5px; transition: background-color 0.2s; }
+    .folder-button:hover { background-color: #dee2e6; }
+    .folder-button.active { background-color: #007bff; color: white; border-color: #007bff; }
+    
+    .explorer { display: flex; gap: 20px; min-height: 50vh; }
+    #image-list { width: 30%; border-right: 1px solid #ddd; padding-right: 20px; overflow-y: auto; }
+    #image-viewer { flex: 1; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa; border-radius: 5px; }
+    
+    .image-list-item { padding: 10px; cursor: pointer; border-radius: 4px; border: 1px solid transparent; }
+    .image-list-item:hover { background-color: #f1f3f5; }
+    .image-list-item.active { background-color: #cce5ff; border-color: #b8daff; font-weight: bold; }
+    
+    #image-viewer img { max-width: 100%; max-height: 80vh; display: block; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    #status-message { text-align: center; color: #6c757d; font-size: 1.1em; padding: 40px 0; }
   </style>
 </head>
 <body>
 
-  <h1>Galerie d'images par dossier</h1>
-  
-  <nav id="folder-nav">
-    <!-- Les boutons des dossiers seront insérés ici par le script -->
-  </nav>
+  <div class="container">
+    <h1>Explorateur d'images</h1>
+    
+    <nav id="folder-nav"></nav>
 
-  <div id="gallery"></div>
-  <p id="status-message">Chargement des dossiers...</p>
+    <div class="explorer">
+      <div id="image-list"></div>
+      <div id="image-viewer">
+        <p id="status-message">Veuillez sélectionner un dossier, puis une image.</p>
+      </div>
+    </div>
+  </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const folderNav = document.getElementById('folder-nav');
-      const gallery = document.getElementById('gallery');
+      const imageList = document.getElementById('image-list');
+      const imageViewer = document.getElementById('image-viewer');
       const statusMessage = document.getElementById('status-message');
-      let imageData = {}; // Pour stocker les données reçues
+      let imageData = {};
 
-      // Fonction pour afficher les images d'un dossier spécifique
-      function displayImages(folderName) {
-        gallery.innerHTML = ''; // On vide la galerie
-        statusMessage.style.display = 'none';
+      function showImage(path, element) {
+        // Met en surbrillance le nom du fichier cliqué
+        document.querySelectorAll('.image-list-item').forEach(item => item.classList.remove('active'));
+        element.classList.add('active');
 
-        // Met à jour le bouton actif
+        // Affiche l'image
+        imageViewer.innerHTML = ''; // Vide la zone de visualisation
+        const img = document.createElement('img');
+        img.src = path;
+        img.alt = "Image en cours de visualisation";
+        imageViewer.appendChild(img);
+      }
+
+      function displayFolderContents(folderName) {
+        // Vide les panneaux précédents
+        imageList.innerHTML = '';
+        imageViewer.innerHTML = '<p id="status-message">Sélectionnez une image dans la liste.</p>';
+
+        // Met à jour le bouton de dossier actif
         document.querySelectorAll('.folder-button').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.folder === folderName);
         });
 
         const images = imageData[folderName] || [];
         if (images.length === 0) {
-            gallery.innerHTML = '<p>Ce dossier est vide.</p>';
+            imageList.innerHTML = '<p>Dossier vide.</p>';
             return;
         }
 
-        images.forEach(path => {
-          const div = document.createElement('div');
-          div.className = 'gallery-item';
-          const img = document.createElement('img');
-          img.src = path;
-          img.alt = `Image du dossier ${folderName}`;
-          div.appendChild(img);
-          gallery.appendChild(div);
+        // Crée la liste des noms de fichiers
+        images.forEach(image => {
+            const item = document.createElement('div');
+            item.className = 'image-list-item';
+            item.textContent = image.name;
+            item.onclick = () => showImage(image.path, item);
+            imageList.appendChild(item);
         });
       }
 
-      // On appelle la Netlify Function
+      // Appel initial à la fonction
+      statusMessage.textContent = 'Chargement des dossiers...';
       fetch('/.netlify/functions/lister-images')
         .then(response => response.json())
         .then(groupedImages => {
@@ -107,25 +96,25 @@
           const folderNames = Object.keys(groupedImages).sort();
 
           if (folderNames.length === 0) {
-            statusMessage.textContent = "Aucun dossier d'images trouvé.";
+            statusMessage.textContent = "Aucun dossier d'images n'a été trouvé.";
             return;
           }
+          
+          statusMessage.parentElement.removeChild(statusMessage); // On enlève le message initial
 
-          statusMessage.textContent = "Veuillez sélectionner un dossier pour voir les images.";
-
-          // On crée les boutons pour chaque dossier
+          // Crée les boutons des dossiers
           folderNames.forEach(name => {
             const button = document.createElement('button');
             button.className = 'folder-button';
             button.textContent = name;
-            button.dataset.folder = name; // On stocke le nom du dossier
-            button.onclick = () => displayImages(name);
+            button.dataset.folder = name;
+            button.onclick = () => displayFolderContents(name);
             folderNav.appendChild(button);
           });
         })
         .catch(error => {
-          console.error("Erreur lors de la récupération des dossiers:", error);
-          statusMessage.textContent = "Impossible de charger la galerie.";
+          console.error("Erreur:", error);
+          statusMessage.textContent = "Impossible de charger les données.";
         });
     });
   </script>
