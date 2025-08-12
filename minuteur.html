@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minuteries en séquence</title>
+<style>
+body {
+display: flex;
+justify-content: center;
+align-items: center;
+height: 100vh;
+margin: 0;
+font-family: sans-serif;
+background-color: #f0f0f0;
+}
+#timer-container {
+text-align: center;
+}
+#timer-display {
+font-size: 5em;
+font-weight: bold;
+color: #333;
+margin-bottom: 20px;
+}
+#start-button {
+font-size: 1.5em;
+padding: 10px 20px;
+cursor: pointer;
+}
+#current-timer-info {
+font-size: 1.2em;
+color: #666;
+}
+</style>
+</head>
+<body>
+
+<div id="timer-container">
+<div id="current-timer-info"></div>
+<div id="timer-display">00:00</div>
+<button id="start-button">Démarrer</button>
+</div>
+
+
+<audio id="start-sound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
+<audio id="end-sound" src="https://actions.google.com/sounds/v1/alarms/medium_bell_ringing_near.ogg" preload="auto"></audio>
+
+<script>
+const timerDurations =[[1](https://www.google.com/url?sa=E&q=https%3A%2F%2Fvertexaisearch.cloud.google.com%2Fgrounding-api-redirect%2FAUZIYQEwajfmsq8KjiKK_nwIlu4wj1DooyMvgDVuas1esd3VFy1ubUZ59aIH1RTcH2K9hnY1vekK8rgNKTINsJgRgkkk_zOMld9hwsOEUhonYsiLA2gEHCDZLczvFMTdvcalS-XXxdGStvM%3D)][[2](https://www.google.com/url?sa=E&q=https%3A%2F%2Fvertexaisearch.cloud.google.com%2Fgrounding-api-redirect%2FAUZIYQH4CbIQl4C57YjscspCdasit82488nP1ZRv-wUuDMtn1L_2JqcDQPZe38SGI4NneVFa84YxR1zYHXNbYNs3U8S4ooTZA9nWmOeinvyhgipSMm8SBIjzSwk2P_pnO_cRjLDOaw%3D%3D)][[2](https://www.google.com/url?sa=E&q=https%3A%2F%2Fvertexaisearch.cloud.google.com%2Fgrounding-api-redirect%2FAUZIYQH4CbIQl4C57YjscspCdasit82488nP1ZRv-wUuDMtn1L_2JqcDQPZe38SGI4NneVFa84YxR1zYHXNbYNs3U8S4ooTZA9nWmOeinvyhgipSMm8SBIjzSwk2P_pnO_cRjLDOaw%3D%3D)];
+let currentTimerIndex = 0;
+let timerInterval;
+
+const timerDisplay = document.getElementById('timer-display');
+const currentTimerInfo = document.getElementById('current-timer-info');
+const startButton = document.getElementById('start-button');
+const startSound = document.getElementById('start-sound');
+const endSound = document.getElementById('end-sound');
+
+function formatTime(seconds) {
+const minutes = Math.floor(seconds / 60);
+const remainingSeconds = seconds % 60;
+return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
+function startTimer(durationMinutes) {
+let secondsRemaining = durationMinutes * 60;
+timerDisplay.textContent = formatTime(secondsRemaining);
+currentTimerInfo.textContent = `Minuterie ${currentTimerIndex + 1} de ${timerDurations.length} en cours : ${durationMinutes} minutes`;
+
+startSound.play();
+
+timerInterval = setInterval(() => {
+secondsRemaining--;
+timerDisplay.textContent = formatTime(secondsRemaining);
+
+if (secondsRemaining <= 0) {
+clearInterval(timerInterval);
+
+if (currentTimerIndex !== 1) {
+endSound.play();
+}
+
+currentTimerIndex++;
+
+if (currentTimerIndex < timerDurations.length) {
+startTimer(timerDurations[currentTimerIndex]);
+} else {
+currentTimerInfo.textContent = "Toutes les minuteries sont terminées !";
+timerDisplay.textContent = "Fin";
+startButton.style.display = 'block';
+}
+}
+}, 1000);
+}
+
+startButton.addEventListener('click', () => {
+currentTimerIndex = 0;
+startTimer(timerDurations[currentTimerIndex]);
+startButton.style.display = 'none';
+});
+
+</script>
+
+</body>
+</html>
